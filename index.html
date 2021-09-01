@@ -11,32 +11,56 @@
   </head>
 
   <body>
-    <h1>Name : Kotchakorn  Somsanong <br> ID : 62100029</h1>
+    <div class="container">
+      <p> 
+      <br> <b>IoT for healthcare : Project III</b>
+      <br> <b> Name : </b>Kotchakorn  Somsanong 
+      <br> <b> ID : </b>62100029 </p>
+    </div>
     
     <div class="container">
       <div class="class row">
-        <div class="class col-6">
-          <canvas id = "myChart" width="400" height="200"></canvas>
+        <div class="class col-4">
+          <canvas id = "mytemp" width="400" height="200"></canvas>
         </div>
-        <div class="class col-6">
-          <canvas id = "myChart2" width="400" height="200"></canvas>
+        <div class="class col-4">
+          <canvas id = "myhum" width="400" height="200"></canvas>
+        </div>
+        <div class="class col-4">
+          <canvas id = "mylight" width="400" height="200"></canvas>
         </div>
       </div>
 
       <div class="class row">
         <div class="class col-3">
           <div class="class row">
-            <div class="class col-4"><b>Temperature</b></div>
-             <div class="col-8" >
+            <div class="class col-6"><b>Temperature : </b></div>
+             <div class="col-6" >
               <span id="lastTemperature"></span>
              </div>
             </div>
 
           <div class="class row">
-            <div class="class col-4"><b>Humidity</b>
+            <div class="class col-6"><b>Humidity :</b>
             </div>
-            <div class="col-8" >
+            <div class="col-6" >
               <span id="lastHumidity"></span>
+            </div>
+          </div>
+
+          <div class="class row">
+            <div class="class col-6"><b>Light :</b>
+            </div>
+            <div class="col-6" >
+              <span id="lastLight"></span>
+            </div>
+          </div>
+
+          <div class="class row">
+            <div class="class col-6"><br>
+            </div>
+            <div class="col-6" >
+              <span><br></span>
             </div>
           </div>
 
@@ -54,9 +78,9 @@
   </body>
   <script>
 
-    function showChart(data){
-      var ctx = document.getElementById('myChart').getContext('2d');
-      var myChart = new Chart(ctx,{
+    function showtemp(data){
+      var ctx = document.getElementById('mytemp').getContext('2d');
+      var mytemp = new Chart(ctx,{
           type :'line',
           data :
           {
@@ -74,9 +98,9 @@
     }
 
 
-    function showLine(data2){
-      var cty = document.getElementById('myChart2').getContext('2d');
-      var myChart = new Chart(cty,{
+    function showhum(data2){
+      var ctx = document.getElementById('myhum').getContext('2d');
+      var myhum = new Chart(ctx,{
           type : 'line',
           data :
           {
@@ -91,12 +115,32 @@
           }
       });
     }
-      
+
+
+
+    function showlight(data3){
+      var ctx = document.getElementById('mylight').getContext('2d');
+      var mylight = new Chart(ctx,{
+          type : 'line',
+          data :
+          {
+            labels : data3.xlabel,
+            datasets : [{
+                label : data3.label,
+                data : data3.data,
+                fill: false,
+                borderColor: 'rgb(107, 207, 154)',
+                tension: 0.1
+            }]
+          }
+      });
+    }
+
       
      
       $(()=>{
           
-          let url = "https://api.thingspeak.com/channels/1458410/feeds.json?results=50";
+          let url = "https://api.thingspeak.com/channels/1458410/feeds.json?results=20";
           $.getJSON(url)
             .done(function(data){
               //console.log(data);
@@ -108,37 +152,49 @@
               const monthNames=["January","February","March","April","May","June",
                                 "July" ,"August","September","October","November","December"];
               let dateStr = d.getDate()+" "+monthNames[d.getMonth()]+" "+[d.getFullYear()+543];
-                  dateStr += " "+d.getHours()+":"+d.getMinutes();
+                  dateStr += " "+"at"+" "+d.getHours()+":"+d.getMinutes();
 
              var plot_data = Object();
              var xlabel = [];
              var temp = [];
              var hum = [];
+             var light = [];
              
             
              $.each(feed,(k,v)=>{
                 xlabel.push(v.entry_id);
                 hum.push(v.field1);
                 temp.push(v.field2);
+                light.push(v.field3);
                 console.log(k,hum);
              });
              
               var data1 = new Object();
               data1.xlabel = xlabel;
               data1.data = temp;
-              data1.label = chan.field2;
-              showChart(data1);
+              data1.label = chan.field2; // chan = channel
+              showtemp(data1);1
 
             
               var data2 = new Object();
               data2.xlabel = xlabel;
               data2.data = hum;
               data2.label = chan.field1;
-              showLine(data2);
+              showhum(data2);
 
+
+              var data3 = new Object();
+              data3.xlabel = xlabel;
+              data3.data = light;
+              data3.label = chan.field3;
+              showlight(data3);
+
+
+              
 
               $("#lastTemperature").text(feed[0].field2 +"  ํC ");
               $("#lastHumidity").text(feed[0].field1 + " %");
+              $("#lastLight").text(feed[0].field3 + " lx "); // lx = unit of lux
               $("#lastUpdate").text(dateStr);
               console.log(hum);
               
