@@ -204,16 +204,5 @@
       });
 
 
-    function timerefresh(t){ // t = time
-        if(t == 0){
-            window.location.reload();
-        }
-        else{
-            t--;
-        }
-            window.setTimeout("timerefresh('"+t+"')",3600)
-    }
-        timerefresh(5)
-    
   </script>
 </html>
